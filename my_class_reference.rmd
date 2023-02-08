@@ -39,3 +39,14 @@ setwd("~/Documents/GitHub/data_journalism_2023_spring")
 install.packages("tidyverse")
 library(tidyverse)
 ```
+
+### How to count rows
+
+You can use the 'n()' function to count rows, like so:
+
+```{r}
+umd_courses %>%
+  group_by(term) %>%
+  summarise(
+    count_classes = n())
+```
