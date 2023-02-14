@@ -50,3 +50,23 @@ umd_courses %>%
   summarise(
     count_classes = n())
 ```
+
+
+
+```{r}
+head(umd_courses)
+summary(umd_courses)
+colnames(umd_courses)
+glimpse(umd_courses)
+```
+head, gives first six rows
+summary, some details
+
+filter template
+```{r}
+journalism_courses <- umd_courses %>% filter(department == "Journalism")
+
+head(journalism_courses)
+```
+==, only journalism
+!=, everything but journalism
