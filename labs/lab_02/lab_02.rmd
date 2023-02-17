@@ -1,0 +1,115 @@
+---
+title: "lab_02"
+author: "derek willis"
+date: "2023-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the tidyverse. If you have not installed the tidyverse already, remove the # from the next line and run it first.  
+# install.packages('tidyverse')
+library(tidyverse)
+library(lubridate)
+```
+
+## Load Data
+
+Let's keep working with the UMD courses and Maryland campaign expense data we used in the pre_lab.
+
+```{r}
+umd_courses <- read_rds("data/umd_courses.rds")
+maryland_expenses <- read_csv("data/maryland_expenses.csv")
+```
+
+## Answer questions
+
+**Q1** Create a new column that divides the expense amounts into the following categories - \$0-\$500, \$500-\$5000, \$5001-\$50000, \$50001\_\$100000, \$100001-\$500000 - giving each an appropriate text value, and count how many expenses are in each group. How would you describe the distribution of expenses in a sentence? Would you change the categories?
+
+**A1.**
+The distribution of the expenses is that there was more in the $0-$500 range, and very few in the largest range of $100001-$500000.The larger the categories are the less expenses. I would maybe make the categories more even, like each category is a $500 difference.
+
+```{r}
+maryland_expenses_with_state <- maryland_expenses %>%
+  mutate(
+    
+    
+    divided_expenses = case_when(
+        amount <500 ~ "$0-$500",
+        amount >500 & amount <5000 ~ "$500-$5000",
+        amount >5001 & amount <50000 ~ "$5001-$50000",
+        amount >50001 & amount <100000 ~ "$50001-$100000",
+        amount >100001 & amount <500000 ~ "$100001-$500000",
+        TRUE ~ as.character(NA)
+        
+        
+      )
+  )
+```
+```{r}
+maryland_expenses_with_state %>%
+  group_by(divided_expenses) %>%
+  summarize(total = n()) %>%
+  arrange(desc(total))
+```
+
+**Q2.** How many departments have offered the courses with "Climate" in the title and at least one seat? Which department has offered the most? 
+**A2.** 
+The department that has the more courses with "Climate" in the title is the Department of Atmospheric and Oceanic Science (AOSC).
+```{r}
+umd_courses %>% 
+  filter(str_detect(title, "Climate")) %>% 
+  filter(seats >= 1) %>% 
+
+  group_by(department) %>%
+  arrange(desc(seats))
+```
+
+```
+**Q3.** Of the departments listed in A2, which one is the most interesting to you, and why?
+**A3.** 
+The most interesting department to me would be any of the humanities department such as Criminanology/Criminal Justice. It would be interesting to see how often these courses with the work "Climate" in it are taught.
+
+
+
+**Q4.** Using the Maryland campaign expenses data, change the datatype of the expenditure_date column so that it is a date and not a chr. Then create a new column for the month based on expenditure_date. Then write code that shows total amount spent each month by Wes Moore's committee (you'll need to search the data to find the exact name). Write a sentence describing the pattern of spending over time.
+**A4.**
+
+```{r}
+maryland_expenses <- maryland_expenses %>% mutate(expenditure_date=mdy(expenditure_date))
+
+```
+
+
+
+**Q5.** Choose your own adventure: using either the UMD courses or campaign expenses data, ask and answer a question that is different than the previous ones. You can use one of the ones you provided in the pre_lab.
+**A5.** 
+The question I am going to be answering is what is the most used expense method? My thought process was that I am doing to mutate all the different expense methods and then count how many times each one was used. Then I would arange that column in descending order to find out what the most used method was. Unfortunatley I am running out of time and will probably not be able to figure it out on time, but that is what I was thinking.
+```{r}
+maryland_expenses_with_state <- maryland_expenses %>%
+  mutate(
+    most_expense_method = case_when(
+        str_detect(expense_method, "Check") ~ "Check",
+        str_detect(expense_method, "Debit Card") ~ "Debit Card",
+        str_detect(expense_method, "EFT") ~ "EFT",
+        str_detect(expense_method, "Credit Card/VISA") ~ "Credit Card/VISA",
+
+        TRUE ~ as.character(NA)
+      )
+  )
+```
+```{r}
+maryland_expenses_with_state %>%
+  group_by(expense_method) %>%
+  summarize(total = n()) %>%
+  arrange(desc(total))
+```
+
