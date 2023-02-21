@@ -38,16 +38,16 @@ maryland_expenses <- read_csv("data/maryland_expenses.csv")
 The distribution of the expenses is that there was more in the $0-$500 range, and very few in the largest range of $100001-$500000.The larger the categories are the less expenses. I would maybe make the categories more even, like each category is a $500 difference.
 
 ```{r}
-maryland_expenses_with_state <- maryland_expenses %>%
+maryland_expenses <- maryland_expenses %>%
   mutate(
     
     
     divided_expenses = case_when(
-        amount <500 ~ "$0-$500",
+        amount <=500 ~ "$0-$500",
         amount >500 & amount <5000 ~ "$500-$5000",
-        amount >5001 & amount <50000 ~ "$5001-$50000",
-        amount >50001 & amount <100000 ~ "$50001-$100000",
-        amount >100001 & amount <500000 ~ "$100001-$500000",
+        amount >5000 & amount <50000 ~ "$5001-$50k",
+        amount >50000 & amount <100000 ~ "$50k-$100k",
+        amount >100000 & amount <500000 ~ "$100k-up",
         TRUE ~ as.character(NA)
         
         
@@ -55,7 +55,7 @@ maryland_expenses_with_state <- maryland_expenses %>%
   )
 ```
 ```{r}
-maryland_expenses_with_state %>%
+maryland_expenses %>%
   group_by(divided_expenses) %>%
   summarize(total = n()) %>%
   arrange(desc(total))
@@ -66,11 +66,10 @@ maryland_expenses_with_state %>%
 The department that has the more courses with "Climate" in the title is the Department of Atmospheric and Oceanic Science (AOSC).
 ```{r}
 umd_courses %>% 
-  filter(str_detect(title, "Climate")) %>% 
-  filter(seats >= 1) %>% 
-
+  filter(str_detect(title, "Climate") & seats > 0) %>% 
   group_by(department) %>%
-  arrange(desc(seats))
+  summarize(classes = n()) %>%
+  arrange(desc(classes))
 ```
 
 ```
@@ -84,7 +83,12 @@ The most interesting department to me would be any of the humanities department 
 **A4.**
 
 ```{r}
-maryland_expenses <- maryland_expenses %>% mutate(expenditure_date=mdy(expenditure_date))
+maryland_expenses <- maryland_expenses %>% 
+  mutate(expenditure_date=mdy(expenditure_date)) %>%
+  mutate(month = floor_date(expenditure_date, "month")) %>%
+  filter(committee_name == "Moore Wes For Maryland") %>%
+  group_by(month) %>%
+  summarise 
 
 ```
 

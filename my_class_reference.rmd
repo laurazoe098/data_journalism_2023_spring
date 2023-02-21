@@ -70,3 +70,36 @@ head(journalism_courses)
 ```
 ==, only journalism
 !=, everything but journalism
+
+
+! mutate !
+```{r}
+maryland_expenses <- maryland_expenses %>%
+  mutate(
+    
+    
+    divided_expenses = case_when(
+        amount <=500 ~ "$0-$500",
+        amount >500 & amount <5000 ~ "$500-$5000",
+        amount >5000 & amount <50000 ~ "$5001-$50k",
+        amount >50000 & amount <100000 ~ "$50k-$100k",
+        amount >100000 & amount <500000 ~ "$100k-up",
+        TRUE ~ as.character(NA)
+        
+        
+      )
+  )
+```
+```{r}
+maryland_expenses %>%
+  group_by(divided_expenses) %>%
+  summarize(total = n()) %>%
+  arrange(desc(total))
+```
+
+!filtering!
+umd_courses %>% 
+  filter(str_detect(title, "Climate") & seats > 0) %>% 
+  group_by(department) %>%
+  summarize(classes = n()) %>%
+  arrange(desc(classes))
