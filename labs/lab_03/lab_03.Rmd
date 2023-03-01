@@ -76,7 +76,7 @@ A2: The fiscal year with the largest total amount is 2009 which had 8 total paym
 ```{r}
 pg_schools %>% 
   group_by(fiscal_year) %>% 
-  summarize(count = n()) %>% 
+  summarize(count = sum(amount)) %>% 
   arrange(desc(count))
 ```
 Q3. You're interested in examining the vendors paid for capital projects at the University of Maryland. Search the payments data to find those payments, then write code to produce a list of each vendor and the total amount it received. Look carefully at that list - what cleaning will it require to ensure that you have only one row per vendor and zip code? Provide at least three examples of vendor names that are similar and should be combined into one. Describe how you might clean that data so that any nearly identical vendors would look identical - what would you change and how?
@@ -99,4 +99,9 @@ Q4: You want to understand how much state grant money went to stem cell research
 A4: I am running out of time but for this question I would search the use the 'filter' function to find what state grant money is going to 'stem cell research projects' I would then I would total up all the money for each fiscal year by grouping, summarazing and arranging. 
 
 ```{r}
+md_grant_loans%>%
+  mutate(description = str_to_upper(description)) %>%
+  filter(str_detect(description,"STEM CELL RESEARCH GRANT"))%>%
+  group_by(fiscal_year)%>%
+  summarize(total = sum(amount))
 ```
