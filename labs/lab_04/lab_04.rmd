@@ -49,7 +49,7 @@ You'll need to load one data set, a CSV file of Maryland campaign expenditures l
 ```{r}
 # Load the Maryland expenditures data table, clean the column names and convert columns with dates into actual dates.
 md_expenses <- read_csv("data/maryland_expenses.csv")
-write_csv(md_expenses, "data/maryland_expenses.csv")
+
 cleaned_md_expenses <- md_expenses %>%
   clean_names()
 
@@ -67,36 +67,63 @@ Then, when you are done standardizing `payee_clean`, export it as a new CSV file
 Then, using that `payee_clean` column, write code to find all of the spending where Facebook is the payee and calculate the total amount of spending for each committee and present the results showing the committee that spent the most first. Which committee is that?
 
 **A1.**
+The committee that spend the most on Facebook/Meta is "Jain Ashwani Friends of." They spent a total of $62,357.38.
 
 ```{r}
-cleaned_md_expenses %>%
-  filter(str_detect(expense_category, "Media")) %>% 
-  group_by(payee_name) %>%
-  summarise(expense_category=n()) %>%
-  arrange(payee_name) 
+cleaned_md_expenses <- cleaned_md_expenses %>% drop_na(payee_name)
+cleaned_md_expenses <-  cleaned_md_expenses %>% filter(str_detect(expense_category, "Media")) 
 
+
+cleaned_md_expenses %>%
+  group_by(payee_name) %>%
+  summarise(expense_category) %>%
+  arrange(desc(expense_category))
+
+cleaned_md_expenses <-write_csv(cleaned_md_expenses, "data/cleaned_maryland_expenses.csv")
+
+
+new_cleaned_md_expenses <- read_csv("data/newcleaned-maryland-expenses-csv.csv")
+
+new_cleaned_md_expenses %>%
+  group_by(payee_clean, committee_name) %>%
+  summarise(total=sum(amount)) %>%
+  filter(str_detect(payee_clean, "Facebook/Meta")) %>%
+  arrange(desc(total))
 
 ```
 
 **Q2.** Let's do some research on the top committees from question 1. Look up the top 10 spenders: if they are candidate committees, what offices were they running for? If they were not candidates, what issues do they seem to care about? Write some sentences answering those questions, then go the Facebook ad library (https://www.facebook.com/ads/library/?active_status=all&ad_type=political_and_issue_ads&country=US&sort_data\[direction\]=desc&sort_data\[mode\]=relevancy_monthly_grouped&media_type=all) and look for ads from the top spender. What do you notice about those ads?
 
 **A2.** 
+Jain Ashwani ran for Democratic governor in 2022. As did Peter Franchot with Monica Anderson-Walker as his running mate for the 2022 Democratic governor. CASA is a Latino and immigrant organization that strives to mobilize black and brown voters. Billy Boniface was a Republican Candidate for Hartford County Executive in 2022. Baron Jon was a Democratic candidate for governor in 2022. Jasani Salimah was a candidate running for the Baltimore City School Board. WFP starts for Working Families Party which is an organization that advocates for working families. John King and Michelle Siri were running mates for the Democratic governor candidate in 2022. Eve Shuman was running for District 3 in the PG County Council race. When looking at the Facebook ads I notice that they are mostly all campaign or political ads. Most of them ends during the month of July or June last year or are currently inactive. Amount spent ranges from 100 - 1,000 dollars per ad. Facebook ads seem to be a great way to advertise their campaign because of how many people each candidate or organization could reach. Except some of the candidates didn't win, so maybe more so for organizations.
 
 **Q3.** Given the list of top spenders in A1 and the primary results for governor (https://elections.maryland.gov/elections/2022/primary_results/gen_results_2022_1.html), who is missing from that A1 list? Did those campaigns run Facebook ads, according to Facebook's ad library? Who are the biggest recipients of media expenses by the Democratic primary winner for governor (HINT: that person has two committees)?
 
 **A3.** 
-
+I would say that the current governer Wes Moore and his running mate is missing from that list. He did run ads according to Facebook's ad library, which is interesting since he was not one of Facebook/Meta's top spender. The biggest recipients of media expenses by the Democratic primary winner for governer, Wes Moore, was "SKDK." It is a public affairs and political consulting firm. The next biggest recipients of media expenses by Wes Moore is Foglamp and Apollo Artistry.
 ```{r}
+new_cleaned_md_expenses %>%
+  group_by(expense_category, payee_clean, committee_name) %>%
+  summarise(total=sum(amount)) %>%
+  filter(str_detect(committee_name, "Moore")) %>%
+  arrange(desc(total))
 ```
 
 **Q4.** The media expense data you cleaned also has a standardized purpose column. Write code to generate a list of the committees with the total amount of spending on online advertising. How does this list compare to the one from Q1 about top Facebook spenders? Of the top 5 committees who spent the most on Facebook ads from Q1, are there any that appear to have spent *all* of their online advertising dollars on Facebook?
 
 **A4.** 
+The committee who spent all of their online advertising Facebook ads from the top 5 committees from Q1 was "Jain Ashwani Friends of." This potentially shows that it might be better for candidates to diversify their online advertising instead of putting all their money on one platforms and only reaching one audience.
 
 ```{r}
-
+new_cleaned_md_expenses %>%
+  group_by(expense_purpose, committee_name, payee_clean) %>%
+  summarise(total=sum(amount)) %>%
+  filter(str_detect(expense_purpose, "Online Advertising")) %>%
+  filter(str_detect(committee_name, "Jain")) %>%
+  arrange(desc(total))
 ```
 
 **Q5** You've been asked to summarize your findings about spending on Facebook by Maryland political candidates. How much do we know and what don't we know? What's the best story idea you've found here?
 
 **A5**
+We know how much money some maryland governer 2022 candidates spent on online advertising and what platforms they invested that in. We also know when this money was given, the method, and the purpose of these transactions. What we do not know is the revenue or what they got back from investing in these expenses. I think an interesting story that can come out of this data is a look into what potentially makes a good campaign based on where a candidate chose to spend their online advertising money. 
