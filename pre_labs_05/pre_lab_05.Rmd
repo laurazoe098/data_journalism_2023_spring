@@ -104,6 +104,7 @@ You can now export that extracted table to a CSV file using the "Export" button.
 
 **Task** Export the CSV file to your pre_lab_06 folder and read it into R by running the following codeblock. What problems do you see with the data? 
 **Answer**
+There are many problems with this data. First, the column names are not representative of the data in the column. Next, The first column listing the county's have a bunch of unnecessary periods. Additionally, the larger number have a commas in them.
 
 ```{r}
 fentanyl_deaths <- read_csv("tabula-Annual_2020_Drug_Intox_Report.csv") %>% clean_names()
