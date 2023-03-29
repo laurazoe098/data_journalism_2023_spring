@@ -144,6 +144,25 @@ baltimore_demographics_911 %>%
 Q4. Choose your own adventure: I want you to come up with a question you could ask of the Baltimore City data that combines both the calls and the demographic information. You must use both demographics and the overdose call data in your work.
 
 A4: 
+First, I wanted to see in total of all the data we have, what months had the most calls. Just as suspected the most calls are in the summer months and the least calls were in the winter months. I also wanted to see if there was a correlation between the percentage of homeowners in a zip code area and the number of calls. There is not an obvious patterns but I would say the zip codes with the higher percentage of homeowners were towards the end and averaged 50%. The zip code with the most calls had a homeowner percent of about 20%
 
 ```{r}
+baltimore_demographics_911$month <- month(baltimore_demographics_911$date,label=TRUE)
+
+baltimore_demographics_911 %>% left_join(county_911_combined, by="month") %>% nrow()
+
+county_baltimore_combined_911 <- baltimore_demographics_911 %>% left_join(county_911_combined)
+
+county_baltimore_combined_911 %>%
+  group_by(month) %>%
+  summarise(total_month= n()) %>%
+  arrange(desc(total_month))
+
 ```
+```{r}
+baltimore_demographics_911%>%
+  group_by(pct_homeowner, zip_code, population)%>%
+  summarise(total_zip= n()) %>%
+  arrange(desc(total_zip)) 
+```
+
