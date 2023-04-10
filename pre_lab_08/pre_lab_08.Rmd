@@ -258,6 +258,7 @@ baltco_911_calls_by_date %>%
   scale_x_date(date_breaks = "1 week", date_labels = "%b %d")
 
 
+
 ```
 
 Those are a little hard to read, so we can turn them 45 degrees to remove the overlap using the theme() function for styling.  With "axis.text.x = element_text(angle = 45,  hjust=1)" we're saying, turn the date labels 45 degrees.
