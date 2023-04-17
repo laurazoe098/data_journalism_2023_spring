@@ -20,6 +20,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 # load libraries here
+library(tidyverse)
+library(janitor)
+library("dplyr")
+
 ```
 
 ## Questions
@@ -38,8 +42,17 @@ You MUST do the following things when answering this question:
 * Describe your thought process below - why you chose to make the chart you did - and add the URL of your chart.
 
 **A1.** 
+I decided to make a split/stacked bar chart that shows the number of votes Larry Hogan got per county in 2018 compared to the number of votes that Dan Cox got this past governors race. I had to hide all the other unnecessary columns and isolate only the data that I was going to use for my chart. This I chose this chart because it easily compares both Hogan's and Cox's votes so that you are able to see who got more. 
+https://www.datawrapper.de/_/T0ziJ/
 
 ```{r}
+md_gov_county <- read_csv("data/md_gov_county.csv")
+md_gov_county_18 <- read_csv("data/md_gov_county_18.csv")
+
+md_gov_merged <- left_join(md_gov_county, md_gov_county_18, by = "GEOID")
+
+write_csv(md_gov_merged, "data/md_gov_merged.csv")
+
 ```
 
 **Q2.** You're interested in seeing how the methods of voting have changed in Maryland since 2018. Using the `md_votes_by_type.csv` that has data from the top of the ticket (governor in 2018 and 2022, president in 2020), make a chart showing the percentage of votes cast in each category - early voting, election day and mail - over the three years. You'll need to make those percentages in R and then export the CSV using `write_csv`, then make the chart in Datawrapper. Have a title, description and source that tells readers about the data. The title and description should highlight the most newsworthy or important aspect.
@@ -49,8 +62,26 @@ HINT: In Datawrapper's "Check and Describe" tab, you can click on a column to ge
 What do you think the story here is? Put the answer below along with the URL of your chart.
 
 **A2.** 
+https://www.datawrapper.de/_/5WD0P/
+I think that the story is that the number of in-person election drastically decreased in 2020 and then went back up for the 2022 elections. This was most likely because of COVID-19. Similarly, mail-in voting went up in 2020 and then decreased in 2022. I used ChatGPT to figure out that I needed to use the summarize function in my new dataframe to add all the voting types together by year. I was trying to use the mutate function before hand but was running into difficulties. I then used to mutate function to come up with the percentages. 
 
 ```{r}
+md_votes_by_type <- read_csv("data/md_votes_by_type.csv")
+clean_names(md_votes_by_type)
+
+md_votes_by_year <- md_votes_by_type %>%
+  group_by(Year) %>%
+  summarise(early_voting_total = sum(Early),
+            election_day_total = sum(`Election Day`),
+            mail_total = sum(Mail)) %>%
+  mutate(total_votes = early_voting_total + election_day_total + mail_total,
+         early_voting_percentage = (early_voting_total / total_votes) * 100,
+         election_day_percentage = (election_day_total / total_votes) * 100,
+         mail_percentage = (mail_total / total_votes) * 100)
+
+
+write_csv(md_votes_by_year, "data/md_votes_by_year.csv")
+
 ```
 
 
@@ -67,6 +98,22 @@ What do you think the story here is? Put the answer below along with the URL of 
 What do you think the story here is, and what would you want to know more about? Put the answer below along with the URL of your map.
 
 **A3.** 
+https://www.datawrapper.de/_/6jdAu/
+
+I think it was interesting how the most calls were located in areas that I consider sort of wealthy parts of Montgomery County. I think it would be interesting to look at for a story. 
 
 ```{r}
+montgomery_2022_overdoses <- read_csv("data/montgomery_2022_overdoses.csv")
+calls_by_zip <- montgomery_2022_overdoses %>%
+  group_by(`zip`) %>%
+  summarize(number_of_calls = n())
+
+total_calls <- sum(calls_by_zip$number_of_calls)
+calls_by_zip <- calls_by_zip %>%
+  mutate(percentage_of_calls = number_of_calls / total_calls * 100)
+
+write_csv(calls_by_zip, "data/calls_by_zip.csv")
+
+
+
 ```
