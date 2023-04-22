@@ -32,6 +32,28 @@ spotify_youtube <- clean_names(spotify_youtube)
 
 
 ```
+```{r}
+#Question 1: How does the amount of energy within music compare to the number of views the song has?
+spotify_youtube <- spotify_youtube %>%
+  mutate(views_energy = energy / views) %>%
+  arrange(desc(views_energy))
+
+#Note: The problem here is that some songs have only 2 views and some have thousands of views, is there a better way to compare here? 
+
+
+
+
+```
+
+```{r}
+#Question 2: Is there a connection between the length of the song and the valence (mood) of the song?
+spotify_youtube <- spotify_youtube %>%
+  mutate(minute_run = duration_ms / 60000) %>%
+  mutate(minute_val_ratio = valence/minute_run) %>%
+  arrange(desc(minute_val_ratio))
+
+#Note: We tried to compare the valence to the minute run but weren’t sure if the number was an accurate representation because the shortest songs were only appearing at the top and some songs did not have valence. We are not sure if there is a better way to find this comparison.   
+```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
