@@ -17,7 +17,7 @@ spotify_youtube <- clean_names(spotify_youtube)
 
 #1. Loads and cleans the core data set to prepare for analysis.
 
-  #We used the cleannames() function to get rid of unnecessary spaces in   the column names. 
+  #We used the cleannames() function to get rid of unnecessary spaces in the column names. 
 
 #2. Shows basic exploratory analysis to demonstrate an understanding of the dataset, including the number of rows and columns, any obvious limitations or flaws and any reasons why it might not be able to answer the questions you've posted last week. 
 
@@ -73,7 +73,7 @@ top20_key <- top20_cleaned%>%
   summarise(total_key=n())%>%
   arrange(desc(total_key))
 
-#Note:
+#Note: The most common keys are 1,7 and 2. 1 is the C# key, 7 is G, and 2 is D. These key's occur 5, 3 and 2 times respectively. Since C# occurs five times within the top 20 songs in the data, our major finding is that the C# key is occurring about 25% of the time among the top 20 most streamed songs.
   
 
 ```
@@ -94,8 +94,19 @@ loudness_rounded <- top20_cleaned%>%
   arrange(desc(total_loudness_rounded))
   
 
-#Note:
+#Note: The most common level of loudness among the top 20 streamed songs is -6, -7 and -5.These key's occur 8, 4 and 2 times respectively. Since 8 out of the 20 most streamed songs have a loudness of -6, this occurs about 40% of the time. We could not figure out how loud that actually is because when we researched decibels, the measuring unit, it was a completely different scale than our data set had it as. 
 
+
+```
+
+```{r}
+#Question 5: Of the top 20 most streamed songs, which song has the highest like to view ratio?
+
+top20_liketoview <- top20_cleaned%>%
+  mutate(like_view = (likes / views)*100)%>%
+  arrange(desc(like_view))
+
+#The songs that have the highest like to view ratio are Heat Waves by Glass Animals and Stay by The Kid Laroi (feat. Justin Bieber), these songs both have approximately a 1.49% like to view ratio. This means that about 1.49% of all the people who viewed their respective music videos gave it a like on YouTube.
 
 ```
 

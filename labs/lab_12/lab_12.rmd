@@ -1,0 +1,103 @@
+---
+title: "lab_12"
+author: "derek willis"
+date: "2023-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* tidytext and our usual libraries
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+```{r}
+install.packages("tidytext")
+library(tidyverse)
+library(tidytext)
+library(janitor)
+library(lubridate)
+library(rvest)
+library(dplyr)
+
+```
+
+## Questions
+
+**Q1.** You've been assigned to report a story about the leading reasons that Maryland attorneys get sanctioned by the state for misconduct. The state [publishes lists of sanctions](https://www.courts.state.md.us/attygrievance/sanctions) that contain a short text description about the situation. Load the CSV file in the data folder containing records from fiscal year 2011 onwards. Make a list of unique words from the text column, then following the example in the pre_lab, remove common "stop words" from that list and create a list of the top 10 words containing the percentage of occurrences each word represents. What's the leading word in that answer and, broadly, what do you think the top 10 words describe?
+
+**A1.** 
+The leading word that I got from the Maryland Attorney Sanctions is health. The top 10 words generally relate to programming, project or funding. It also mentions themes around community and Baltimore.
+
+```{r}
+sanctions <- read_csv("data/md_attorney_sanctions.csv")
+
+text <- sanctions %>% top_n(10) %>%  pull(text)
+
+unique_words <- releases %>% select(text) %>%
+  unnest_tokens(word, text)
+View(unique_words)
+
+stop_words <- stop_words %>%
+  add_row(word = 'washington') %>% 
+  add_row(word = "ben") %>% 
+  add_row(word = "cardin") %>% 
+  add_row(word = "senator") %>%
+  add_row(word = "senators") %>%
+  add_row(word = "maryland") %>%
+  add_row(word = 'federal') %>% 
+  add_row(word = 'u.s') %>% 
+  add_row(word = 'md') %>% 
+  add_row(word = 'senate') %>% 
+  add_row(word = "hollen") %>% 
+  add_row(word = "van") %>% 
+  add_row(word = "chris")
+
+unique_words %>%
+  anti_join(stop_words) %>%
+  group_by(word) %>%
+  tally(sort=TRUE) %>%
+  mutate(percent = (n/sum(n))*100) %>%
+  top_n(50)
+
+```
+
+**Q2.** Let's move beyond single words to phrases. Make a list of the top 10 three-word phrases, called trigrams, based on the example from the pre_lab (you'll need to modify the example code to do this). What's the top trigram and how often does it appear? What does that phrase mean in legal terms?
+
+**A2.** 
+The top trigram is attorney trust account and it appears 343 times in the Maryland sanctions. According to Google, an attorney trust account is an attorney trust account is a particular bank account where client funds are kept safe until it is time to withdraw them.
+```{r}
+sanctions %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 3) %>%
+  separate(bigram, c("word1", "word2", "word3"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word) %>%
+  mutate(trigram = paste(word1, word2, word3, sep=" ")) %>%
+  group_by(trigram) %>%
+  tally(sort=TRUE) %>%
+  mutate(percent = (n/sum(n))*100) %>%
+  top_n(10)
+```
+
+**Q3.** Let's drop back down to more traditional text analysis - take the top trigram from Q2 and write code to see how many times it occurs in the text column in each fiscal year. What do you think the answer produced by your code suggests? What else could you do to try and clarify the most important reasons attorneys get sanctioned?
+
+**A3.** 
+The code suggests that 2021 was the year where "attorney trust account" appeared the most in the sanctions with a total of 37 times. I would want to clarify why 2021 was a particularly high year for this to be a reason for someone to get sanctioned. I would also want to see if there are other reasons attorney's get sactioned other than for misusing their clients accounts and see if there is any relations.
+```{r}
+
+sanctions %>%
+  filter(str_detect(text, "attorney trust account")) %>%
+  group_by(fiscal_year) %>%
+  summarise(count = n())%>%
+arrange(desc(count))
+
+
+
+
+```
