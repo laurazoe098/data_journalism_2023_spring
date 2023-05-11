@@ -80,7 +80,7 @@ top_20 <- spotify_youtube %>%
     top20_cleaned <- top_20[c (-5, -8, -11, -13, -23), ]
     
     
-top20_key <- top20_cleaned%>%
+  spotify_youtube %>%  
   group_by(key)%>%
   summarise(total_key=n())%>%
   arrange(desc(total_key))
